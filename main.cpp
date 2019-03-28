@@ -5,6 +5,11 @@
 	@author:
 	Name & Surname: Osman Araz
 	Student ID: 16011020
+
+	@author:
+	Name & Surname: Ahmed Bilal Güvenç
+	Student ID: 16011069
+
 	Delivery Date: 28.03.2019
 */
 
@@ -144,10 +149,11 @@ int main()
 	else // informing the user to say there is no appropriate path
 	{
 		printBanner();
-		std::cout << "\tCouldn't find a path to solve this maze with lentgh " << M << " :(\n";
+		std::cout << "\tCouldn't find a path to solve this maze with lengTh " << M << " :(\n";
 		printMaze(maze);
 	}
 
+    std::cout << "\tPress ENTER to exit from program. ";
 	getchar();
 	getchar();
 
@@ -162,7 +168,7 @@ int main()
 */
 void fillMaze(std::vector <std::vector <char>> &maze, int N, int K)
 {
-	maze[N / 2][N / 2] = 'P';
+	maze[N/2][N/2] = 'P';
 
 	for (int i = 0; i < K; ++i)
 	{
@@ -292,7 +298,7 @@ bool calculateFitness(std::vector <std::vector <char>> &maze, Path &path, int K,
 
 	path.weight = eatenFoods.size();
 
-	// if we eat all of the foods early (before reach to initial lentgh),
+	// if we eat all of the foods early (before reach to initial length),
 	// then our fitness value will be increased as the difference bitween
 	// the initial length and the new length of the path,
 	// and also we need to shrink the size of the path
