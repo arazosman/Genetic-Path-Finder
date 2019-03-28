@@ -10,7 +10,7 @@
 	Name & Surname: Ahmed Bilal Güvenç
 	Student ID: 16011069
 
-	Delivery Date: 28.03.2019
+	Delivery Date: 28.03.2019 
 */
 
 #include <iostream>
