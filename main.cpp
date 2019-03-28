@@ -117,7 +117,7 @@ int main()
 				resizePatterns(maze, paths, K, M);
 			}
 
-			std::cout << "\n\n\t" << j << " generations have passed.\n";
+			std::cout << "\n\n\t" << j+1 << " generations have passed.\n";
 			std::cout << "\tBest Path: " << shortestPath.pattern << "\n";
 			std::cout << "\tPath length: " << shortestPath.pattern.size() << "\n";
 			std::cout << "\tPath fitness: " << shortestPath.fitness << " (# of foods + distance between path length and M)\n";
