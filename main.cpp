@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <string>
 #include <vector>
 #include <set>
 #include <cstdlib>
