@@ -91,7 +91,7 @@ int main()
 	while (toupper(ch) == 'Y' && paths[0].weight < K)
 	{
 		// trying for 1000 generations
-		for (int i = 0; i < 1000 && paths[0].weight < K; ++i)
+		for (size_t i = 0; i < 1000 && paths[0].weight < K; ++i)
 		{
 			std::cout << "\tGeneration #" << ++j << ": " << paths[0].pattern << " (" << paths[0].fitness << ")\n";
 			paths = evolution(maze, paths, K, M, P); // paths are evolving
