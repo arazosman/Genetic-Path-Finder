@@ -6,7 +6,7 @@
 	Name & Surname: Osman Araz
 	Student ID: 16011020
 
-	@author:
+	@author: 
 	Name & Surname: Ahmed Bilal Güvenç
 	Student ID: 16011069
 
