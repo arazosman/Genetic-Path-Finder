@@ -33,13 +33,13 @@ struct Path
 void clearScreen();
 void fillMaze(std::vector <std::vector <char>> &maze, int N, int K);
 void initilizePaths(std::vector <Path> &paths, std::vector <std::vector <char>> &maze, int M, int K);
-std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector <Path> &paths, int K, int M);
+std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector <Path> &paths, int K, int M, int P);
 void resizePatterns(std::vector <std::vector <char>> &maze, std::vector <Path> &paths, int K, int M);
 int main()
 {
 	srand(time(NULL));
 
-	int N, K, M; // N: matrix size, K: # of foods, M: length of paths
+	int N, K, M, P; // N: matrix size, K: # of foods, M: length of paths, P: population size
 
 	printBanner();
 
@@ -51,13 +51,18 @@ int main()
 		std::cin >> K;
 		std::cout << "\tEnter the length of paths (M): ";
 		std::cin >> M;
+		std::cout << "\tEnter the length of population size (P), (should be at least 50): ";
+		std::cin >> P;
 
 		if (K >= N * N)
 			std::cout << "\n\tNumber of foods should be less than the number of cells in the maze!\n\n";
 
-		if (M < 1)
-			std::cout << "\n\tLength of the paths must be a positive integer!\n\n";
-	} while (K >= N * N || M < 1);
+		if (P < 10)
+			std::cout << "\n\tPopulation size must be greater than 50!\n\n";
+
+		if (N < 1 || K < 1 || M < 1)
+			std::cout << "\n\tValues must be positive integers!\n\n";
+	} while (K >= N * N || P < 50 || N < 1 || K < 1 || M < 1);
 
 	// generating the maze matrix, all cells initalized with a space character:
 	std::vector <std::vector <char>> maze(N, std::vector <char>(N, ' '));
@@ -72,34 +77,33 @@ int main()
 
 	printBanner();
 
-	// generating and initializing 100 paths for the first generation:
-	std::vector <Path> paths(100);
+	// generating and initializing P paths for the first generation:
+	std::vector <Path> paths(P);
 	initilizePaths(paths, maze, M, K);
 
 	// sorting the paths accorrding to their fitnesses:
 	std::sort(paths.begin(), paths.end(), [](const Path &lhs, const Path &rhs) { return lhs.fitness > rhs.fitness; });
 
-	int i = 1, j = 0;
+	int j = 0; // represents the current generation number
 	char ch = 'Y';
 
 	// searching for a appropriate path:
 	while (toupper(ch) == 'Y' && paths[0].weight < K)
 	{
 		// trying for 1000 generations
-		while (j < 1000 * i && paths[0].weight < K)
+		for (int i = 0; i < 1000 && paths[0].weight < K; ++i)
 		{
 			std::cout << "\tGeneration #" << ++j << ": " << paths[0].pattern << " (" << paths[0].fitness << ")\n";
-			paths = evolution(maze, paths, K, M); // paths are evolving
+			paths = evolution(maze, paths, K, M, P); // paths are evolving
 			// sorting the paths accorrding to their fitnesses:
 			std::sort(paths.begin(), paths.end(), [](const Path &lhs, const Path &rhs) { return lhs.fitness > rhs.fitness; });
 		}
 
 		if (paths[0].weight < K) // if an appropriate path could not be found:
 		{
-			++i;
 			std::cout << "\n\tPath could not be found up to generation #" << j << ".\n";
 			std::cout << "\tIt may not be possible to find a path with the length you have specified.\n";
-			std::cout << "\tDo you want continue to seek for a path? (Y/N): ";
+			std::cout << "\tDo you want to continue to seek for a path? (Y/N): ";
 			std::cin >> ch;
 		}
 	}
@@ -137,7 +141,7 @@ int main()
 				for (int i = 0; i < 1000 && paths[0].fitness <= shortestPath.fitness; ++i)
 				{
 					std::cout << "\n\tGeneration #" << ++j << ": " << paths[0].pattern << " (fitness: " << paths[0].fitness << ")";
-					paths = evolution(maze, paths, K, M); // paths are evolving
+					paths = evolution(maze, paths, K, M, P); // paths are evolving
 					// sorting the paths accorrding to their fitnesses:
 					std::sort(paths.begin(), paths.end(), [](const Path &lhs, const Path &rhs) { return lhs.fitness > rhs.fitness; });
 				}
@@ -149,7 +153,7 @@ int main()
 	else // informing the user to say there is no appropriate path
 	{
 		printBanner();
-		std::cout << "\tCouldn't find a path to solve this maze with lengTh " << M << " :(\n";
+		std::cout << "\tCouldn't find a path to solve this maze with the length " << M << " :(\n";
 		printMaze(maze);
 	}
 
@@ -220,11 +224,12 @@ void initilizePaths(std::vector <Path> &paths, std::vector <std::vector <char>> 
 	@param paths: array of the paths
 	@param K: # of foods
 	@param M: the length of the initial path
+	@param P: # of population size
 	@return newPaths: the new generation
 */
-void selectParents(int &p1, int &p2);
+void selectParents(int &p1, int &p2, int P);
 Path crossover(const std::string &parentPattern1, const std::string &parentPattern2);
-std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector <Path> &paths, int K, int M)
+std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector <Path> &paths, int K, int M, int P)
 {
 	// generating the new generation
 	std::vector <Path> newPaths(paths.size());
@@ -234,7 +239,7 @@ std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector
 		do
 		{
 			int p1, p2;
-			selectParents(p1, p2); // selecting parents for each individual of new generation
+			selectParents(p1, p2, P); // selecting parents for each individual of new generation
 			// parent genes crossovers to make the child:
 			newPaths[i] = crossover(paths[p1].pattern, paths[p2].pattern);
 			// fixing the path if there is a consecutive recursion:
@@ -250,15 +255,16 @@ std::vector <Path> evolution(std::vector <std::vector <char>> &maze, std::vector
 	A function to select parents randomly over the generation.
 	@param p1: the first parent
 	@param p2: the second parent
+	@param P: # of population size
 */
-void selectParents(int &p1, int &p2)
+void selectParents(int &p1, int &p2, int P)
 {
-	if (rand() % 2 == 0) // with 0.5 probability
-		p1 = rand() % 10, p2 = rand() % 10; // two of first 10 parents
-	else if (rand() % 2 == 0) // with 0.5*0.5 probability
-		p1 = rand() % 25, p2 = rand() % 25; // two of first 25 parents
-	else  // with 0.5*0.5 probability
-		p1 = rand() % 100, p2 = rand() % 100; // two of first 100 parents
+	if (rand() % 3 < 2) // with 0.66 probability
+		p1 = rand() % (P/10), p2 = rand() % (P/10); // two of best %10 parents
+	else if (rand() % 3 < 2) // with 0.22 probability
+		p1 = rand() % (P/4), p2 = rand() % (P/4); // two of best %25 parents
+	else  // with 0.11 probability
+		p1 = rand() % P, p2 = rand() % P; // two of any parents
 }
 
 // a function to check whether we cross with the wall or not:
@@ -297,17 +303,18 @@ bool calculateFitness(std::vector <std::vector <char>> &maze, Path &path, int K,
 	}
 
 	path.weight = eatenFoods.size();
+	path.fitness = path.weight;
 
 	// if we eat all of the foods early (before reach to initial length),
 	// then our fitness value will be increased as the difference bitween
 	// the initial length and the new length of the path,
 	// and also we need to shrink the size of the path
 
-	// if we couldn't eat foods before reach to initial length, the lines 
-	// of codes below will also be harmless
-
-	path.fitness = path.weight + M - j;
-	path.pattern.resize(j);
+	if (j < path.pattern.size())
+	{
+		path.fitness += M - j;
+		path.pattern.resize(j);
+	}
 
 	return true; // we are alive
 }

@@ -8,9 +8,9 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <Windows.h> // for Windows OS
+	#include <Windows.h> // for Windows OS
 #else
-#include <unistd.h> // for Posix
+	#include <unistd.h> // for Posix
 #endif
 
 // an array which represents directions, elements are left, up, right and down respectively
@@ -56,7 +56,7 @@ void visualizePath(std::vector <std::vector <char>> &maze, const std::string &pa
 	std::cout << "\t(1: left, 2: up, 3: right, 4: down)\n";
 	printPattern(pattern, -1);
 	printMaze(maze);
-	waitForMilliSeconds(1000);
+	waitForMilliSeconds(1500);
 
 	for (size_t i = 0; i < pattern.size(); ++i)
 	{
@@ -73,7 +73,7 @@ void visualizePath(std::vector <std::vector <char>> &maze, const std::string &pa
 		std::cout << "\t(1: left, 2: up, 3: right, 4: down)\n";
 		printPattern(pattern, i);
 		printMaze(maze);
-		waitForMilliSeconds(1000);
+		waitForMilliSeconds(750);
 	}
 
 	std::cout << "\tLength of the path: " << pattern.size() << "\n";
@@ -99,22 +99,22 @@ void printPattern(const std::string &pattern, int pos)
 
 void clearScreen()
 {
-#ifdef _WIN32           // for Windows OS
-	system("cls");
-#else
-	system("clear");    // for Posix
-#endif
+	#ifdef _WIN32           // for Windows OS
+		system("cls");
+	#else
+		system("clear");    // for Posix
+	#endif
 }
 
 void waitForMilliSeconds(int milliSeconds)
 {
 	std::cout.flush();
 
-#ifdef _WIN32                   // for Windows OS
-	Sleep(milliSeconds);
-#else
-	usleep(1000 * milliSeconds);  // for Posix
-#endif
+	#ifdef _WIN32                   // for Windows OS
+		Sleep(milliSeconds);
+	#else
+		usleep(1000 * milliSeconds);  // for Posix
+	#endif
 }
 
 void printBanner()
